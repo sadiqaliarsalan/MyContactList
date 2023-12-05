@@ -1,0 +1,39 @@
+﻿@page "/contactlist"
+@using MyContactList.Common.Models;
+@inject ContactService ContactService
+
+<h3>Contact List</h3>
+
+@if (contacts == null)
+{
+    <p>Something is wrong. No Contacts Found</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in contacts)
+            {
+                <tr>
+                    <td>@contact.Name</td>
+                    <td><a href="/contactdetails/@contact.Id">View Details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Contact>? contacts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contacts = await ContactService.GetContactsAsync();
+    }
+}

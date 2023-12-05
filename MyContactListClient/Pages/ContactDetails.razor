@@ -1,0 +1,64 @@
+﻿@page "/contactdetails/{Id:int}"
+@using MyContactList.Common.Models;
+@inject ContactService ContactService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<h3>Contact Details</h3>
+
+@if (contact == null)
+{
+    <p>Something is wrong. No Contact Detail Found</p>
+}
+else
+{
+    <EditForm Model="@contact" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <InputText id="name" class="form-control" @bind-Value="contact.Name" />
+
+            <label for="address">Address:</label>
+            <InputText id="address" class="form-control" @bind-Value="contact.Address" />
+
+            <label for="phoneNumber">Phone Number:</label>
+            <InputText id="phoneNumber" class="form-control" @bind-Value="contact.PhoneNumber" />
+
+            <label for="birthday">Birthday:</label>
+            <InputDate id="birthday" class="form-control" @bind-Value="contact.Birthday" />
+
+            <label for="workplace">Workplace:</label>
+            <InputText id="workplace" class="form-control" @bind-Value="contact.Workplace" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Update</button>
+        <button class="btn btn-primary" @onclick="GoBack">Go Back</button>
+
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Contact? contact;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contact = await ContactService.GetContactAsync(Id);
+    }
+
+    private async Task HandleSubmit()
+    {
+        await ContactService.UpdateContactAsync(contact);
+        await JSRuntime.InvokeVoidAsync("alert", "Contact updated successfully");
+        contact = await ContactService.GetContactAsync(Id); // refetch to get updated info
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/contactlist");
+    }
+}
